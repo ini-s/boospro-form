@@ -2,32 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@layer base {
+  html {
+    @apply scroll-smooth;
   }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  img {
+    @apply object-cover;
   }
+
+  /* ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/80 hover:bg-primary ease-linear duration-200 cursor-pointer rounded-full;
+  } */
+
+  /* * {
+    @apply border-app-black;
+  } */
+
+  /* h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold;
+  } */
+
+  /* h1 {
+    @apply text-app-h1;
+  } */
+  /* 
+  label {
+    @apply cursor-pointer block;
+  } */
+
+  /* input {
+    @apply focus:outline-none bg-transparent;
+  } */
+
+  /* summary::-webkit-details-marker,
+  summary::marker {
+    @apply hidden;
+  } */
+}
+
+@layer components {
+  /* .app-padding {
+    @apply px-5 md:px-9 xl:px-[--full-bleed];
+  } */
 }

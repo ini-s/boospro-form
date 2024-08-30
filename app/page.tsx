@@ -1,113 +1,368 @@
+"use client";
+import { useState, useEffect } from "react";
+
+import ShowView from "@/components/ShowView";
+import SvgIcon from "@/components/SvgIcon";
 import Image from "next/image";
 
+import { useForm, SubmitHandler } from "react-hook-form";
+
+interface IUserDetails {
+  countryName: string;
+  companyName: string;
+  workers: string;
+}
+
 export default function Home() {
+  const [isScreenLarge, setIsScreenLarge] = useState(false);
+  const [active, setIsActive] = useState("country");
+  const [isValid, setIsValid] = useState(false);
+
+  console.log(active);
+
+  const defaultValues = {
+    countryName: "",
+    companyName: "",
+    workers: "",
+  };
+
+  const {
+    watch,
+    handleSubmit,
+    formState: { errors },
+    register,
+    trigger,
+  } = useForm<IUserDetails>({
+    defaultValues,
+  });
+
+  useEffect(() => {
+    const checkScreenSize = () => setIsScreenLarge(window.innerWidth >= 800);
+
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const values = watch();
+
+  useEffect(() => {
+    const checkValidity = () => {
+      if (active === "country" && values.countryName) {
+        setIsValid(true);
+      } else if (active === "name" && values.companyName) {
+        setIsValid(true);
+      } else if (active === "workers" && values.workers) {
+        setIsValid(true);
+      } else {
+        setIsValid(false);
+      }
+    };
+
+    checkValidity();
+  }, [active, values]);
+
+  const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    const isStepValid = await trigger(
+      active === "country"
+        ? "countryName"
+        : active === "name"
+        ? "companyName"
+        : "workers"
+    );
+
+    if (isStepValid) {
+      if (active === "country") setIsActive("name");
+      else if (active === "name") setIsActive("workers");
+      else setIsActive("country");
+    }
+  };
+
+  const onSubmit: SubmitHandler<IUserDetails> = (data) => {
+    console.log(data);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="relative w-screen">
+      <div className="px-6 md:flex md:px-0 md:h-screen">
+        {/* left */}
+        <div className="relative basis-2/5 xl:basis-[30%] md:bg-[#EBF6FF] md:px-[23px]">
+          <div>
+            <div className="mt-[42px] md:mt-[23px] flex items-center gap-2">
+              <div className="flex items-center justify-center relative h-[30px] w-[30px] border rounded-1/2 border-black cursor-pointer">
+                <SvgIcon name="left-arrow" className="h-4 w-5" />
+              </div>
+              <p className="font-bold text-[13px]">Back to home</p>
+            </div>
+
+            <ShowView when={isScreenLarge}>
+              <div className="mt-9 xl:mt-12 flex items-center">
+                <div className="relative w-[42px] h-[45px] ">
+                  <Image
+                    className="absolute h-full w-full"
+                    src="/bootspro-logo.png"
+                    alt="logo"
+                    sizes="100%"
+                    fill
+                  />
+                </div>
+                <div className="relative w-[134px] h-5">
+                  <Image
+                    className="absolute h-full w-full"
+                    src="/boostpro.png"
+                    alt="boostpro"
+                    sizes="100%"
+                    fill
+                  />
+                </div>
+              </div>
+            </ShowView>
+          </div>
+
+          <div className="relative flex mt-9 mb-16 flex-col mx-auto w-56 justify-center md:mx-0 md:w-full">
+            <span className="absolute w-56 h-1 z-0 bg-grey md:w-1 md:h-[65%] md:ml-[19px] l:h-[70%] l:top-0"></span>
+
+            <div className="flex justify-between z-2 md:block">
+              <div className="md:flex md:mb-8">
+                <div className="bg-app-black h-10 w-10 flex items-center justify-center rounded-10">
+                  <SvgIcon
+                    name="map"
+                    className={`${
+                      active === "country" ? "text-white" : ""
+                    } h-6 w-6`}
+                  />
+                </div>
+                <ShowView when={isScreenLarge}>
+                  <div className="ml-[7px]">
+                    <p className="font-bold l:text-lg">Your country</p>
+                    <p className="l:text-lg">Provide where you reside</p>
+                  </div>
+                </ShowView>
+              </div>
+
+              <div className="md:flex md:mb-8">
+                <div className="bg-app-black h-10 w-10 flex items-center justify-center rounded-10">
+                  <SvgIcon
+                    name="home"
+                    className={`${
+                      active === "name" ? "text-white" : ""
+                    } h-6 w-6`}
+                  />
+                </div>
+                <ShowView when={isScreenLarge}>
+                  <div className="ml-[7px]">
+                    <p className="font-bold l:text-lg">Your company name</p>
+                    <p className="l:text-lg">Provide the registered name</p>
+                  </div>
+                </ShowView>
+              </div>
+
+              <div className="md:flex md:mb-8">
+                <div className="bg-app-black h-10 w-10 flex items-center justify-center rounded-10">
+                  <SvgIcon
+                    name="briefcase"
+                    className={`${
+                      active === "workers" ? "text-white" : ""
+                    } h-6 w-6`}
+                  />
+                </div>
+                <ShowView when={isScreenLarge}>
+                  <div className="ml-[7px]">
+                    <p className="font-bold l:text-lg">Total workers</p>
+                    <p className="l:text-lg">Number of workers</p>
+                  </div>
+                </ShowView>
+              </div>
+            </div>
+          </div>
+
+          <ShowView when={isScreenLarge}>
+            <div className="absolute h-40 w-44 right-[-2.3rem] bottom-10">
+              <Image
+                className="h-full w-full object-contain"
+                src="/bg-2.png"
+                alt="bg"
+                sizes="100%"
+                fill
+              />
+            </div>
+          </ShowView>
         </div>
+
+        {/* right  */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="relative mx-auto text-center max-w-[320px] xl:max-w-[400px] basis-3/5 xl:basis:[70%] md:mt-[60px] xl:mt-20"
+        >
+          <div className="relative w-14 h-[60px] xl:w-16 xl:h-[70px] mx-auto mb-7">
+            <Image
+              className="absolute h-full w-full"
+              src="/bootspro-logo.png"
+              alt="logo"
+              sizes="100%"
+              fill
+            />
+          </div>
+
+          <ShowView when={active === "country"}>
+            <h1 className="capitalize font-bold text-[26px] xl:text-[30px]">
+              Your country
+            </h1>
+            <p className="xl:text-lg">Provide where you reside</p>
+
+            <div className="mt-7 xl:mt-8 text-left flex flex-col ">
+              <label
+                htmlFor="countryName"
+                className="text-app-black-800 font-semibold capitalize mb-1"
+              >
+                Enter country name
+              </label>
+              <input
+                type="text"
+                id="countryName"
+                className="border-app-black-800 border rounded-10 outline-app-black-800 h-10 indent-4"
+                {...register("countryName", {
+                  required: "Please enter your country name",
+                })}
+              />
+              {errors.countryName && (
+                <p className="text-red-500 text-sm">
+                  {errors.countryName.message}
+                </p>
+              )}
+            </div>
+          </ShowView>
+
+          <ShowView when={active === "name"}>
+            <h1 className="capitalize font-bold text-[26px] xl:text-[30px]">
+              Your company name
+            </h1>
+            <p className="xl:text-lg">Provide the registered name</p>
+
+            <div className="mt-7 xl:mt-8 text-left flex flex-col ">
+              <label
+                htmlFor={"name"}
+                className="text-app-black-800 font-semibold capitalize mb-1"
+              >
+                Enter company name
+              </label>
+              <input
+                type="text"
+                id={"name"}
+                className="border-app-black-800 border rounded-10 outline-app-black-800 h-10 indent-4"
+                {...register("companyName", {
+                  required: "Please enter your company name",
+                })}
+              />
+              {errors.companyName && (
+                <p className="text-red-500 text-sm">
+                  {errors.companyName.message}
+                </p>
+              )}
+            </div>
+          </ShowView>
+
+          <ShowView when={active === "workers"}>
+            <h1 className="capitalize font-bold text-[26px] xl:text-[30px]">
+              Total workers
+            </h1>
+            <p className="xl:text-lg">Number of workers</p>
+
+            <div className="mt-7 xl:mt-8 text-left flex flex-col ">
+              <label
+                htmlFor="workers"
+                className="text-app-black-800 font-semibold capitalize mb-1"
+              >
+                Enter total number of workers
+              </label>
+              <input
+                type="text"
+                id="workers"
+                className="border-app-black-800 border rounded-10 outline-app-black-800 h-10 indent-4"
+                {...register("workers")}
+              />
+              {errors.workers && (
+                <p className="text-red-500 text-sm">{errors.workers.message}</p>
+              )}
+            </div>
+          </ShowView>
+
+          <button
+            className="mt-7 font-medium text-white bg-[#28323E] rounded-30 w-full py-2.5 pointer"
+            onClick={active === "workers" ? undefined : handleClick}
+          >
+            Continue
+          </button>
+
+          <ShowView when={isScreenLarge}>
+            <div className="absolute bottom-5 flex justify-between h-[5px] w-60 left-1/2 translate-x-[-50%] ">
+              <div
+                className={`${
+                  active === "country" ? "red" : "bg-light-blue-gray "
+                }w-[74px] h-full rounded-20`}
+              ></div>
+              <div
+                className={`${
+                  active === "name"
+                    ? "bg-dark-blue-gray"
+                    : "bg-light-blue-gray "
+                }w-[74px] h-full rounded-20`}
+              ></div>
+              <div
+                className={`${
+                  active === "workers"
+                    ? "bg-dark-blue-gray"
+                    : "bg-light-blue-gray "
+                }w-[74px] h-full rounded-20`}
+              ></div>
+            </div>
+          </ShowView>
+        </form>
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
+      <div className="absolute w-14 h-14 bottom-[2rem] right-5 pointer s:right-8 md:left-6 md:h-[70px] md:w-[70px]">
         <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+          className="h-full w-full"
+          src="/chat-icon.png"
+          alt="chat-icon"
+          sizes="100%"
+          fill
         />
       </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+      <ShowView when={!isScreenLarge}>
+        <div className="absolute bottom-[-2rem] flex justify-between h-[5px] w-60 left-1/2 translate-x-[-50%] ">
+          <div
+            className={`${
+              active === "country" ? "bg-dark-blue-gray" : "bg-light-blue-gray "
+            } w-[74px] h-full rounded-20`}
+          ></div>
+          <div
+            className={`${
+              active === "name" ? "bg-dark-blue-gray" : "bg-light-blue-gray "
+            } w-[74px] h-full rounded-20`}
+          ></div>
+          <div
+            className={`${
+              active === "workers" ? "bg-dark-blue-gray" : "bg-light-blue-gray "
+            } w-[74px] h-full rounded-20`}
+          ></div>
+        </div>
+      </ShowView>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      <ShowView when={!isScreenLarge}>
+        <div className="relative w-[184px] h-[200px] left-[-2.65rem] top-[-1rem] z-[-1]">
+          <Image
+            className="h-full w-full object-contain"
+            src="/bg-1.png"
+            alt="background-image"
+            sizes="100%"
+            fill
+          />
+        </div>
+      </ShowView>
+    </div>
   );
 }
