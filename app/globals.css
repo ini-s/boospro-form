@@ -7,7 +7,7 @@
     @apply scroll-smooth;
   }
   img {
-    @apply object-cover;
+    @apply object-cover h-full w-full;
   }
 
   /* ::-webkit-scrollbar {

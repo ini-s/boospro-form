@@ -27,6 +27,7 @@ const config: Config = {
       },
       boxShadow: {
         "header-shadow": "0 4px 20px 0 rgba(0, 0, 0, 0.25)",
+        "box-shadow": "9px 9px 30px 0px rgba(0, 0, 0, 0.4)",
       },
       colors: {
         // primary: {
